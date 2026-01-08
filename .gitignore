@@ -1,0 +1,24 @@
+# General
+/docs
+*.log
+.DS_Store
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Distribution / Packaging
+dist/
+build/
+*.egg-info/
+
+# Virtual Environments
+venv/
+env/
+.env
+
+# IDEs
+.vscode/
+.idea/
+*.swp
