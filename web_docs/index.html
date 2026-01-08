@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>hwplib-py Documentation</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css">
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        .layout {
+            display: flex;
+            flex: 1;
+            max-width: 1400px;
+            margin: 0 auto;
+            width: 100%;
+            padding: 0 1rem;
+        }
+
+        aside {
+            width: 280px;
+            padding: 2rem 0;
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            overflow-y: auto;
+            border-right: 1px solid var(--muted-border-color);
+            font-size: 0.9em;
+        }
+
+        main {
+            flex: 1;
+            padding: 2rem;
+            max-width: 900px;
+        }
+
+        nav ul {
+            padding: 0;
+        }
+
+        nav li {
+            list-style: none;
+            margin-bottom: 0.3rem;
+        }
+
+        nav a {
+            display: block;
+            padding: 0.2rem 0;
+            color: var(--color);
+            text-decoration: none;
+        }
+
+        nav a:hover {
+            color: var(--primary);
+        }
+
+        nav strong {
+            display: block;
+            margin-top: 1.5rem;
+            margin-bottom: 0.5rem;
+            color: var(--contrast);
+            border-bottom: 1px solid #eee;
+            padding-bottom: 0.2rem;
+        }
+
+        h2 {
+            margin-top: 2rem;
+            border-bottom: 2px solid var(--primary);
+            padding-bottom: 0.5rem;
+        }
+
+        h3 {
+            margin-top: 1.5rem;
+            color: var(--contrast);
+        }
+
+        pre {
+            background: #f6f8fa;
+            padding: 1rem;
+            border-radius: 6px;
+            overflow-x: auto;
+            font-size: 0.9em;
+            border: 1px solid #e1e4e8;
+        }
+
+        code {
+            color: #d63384;
+            font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+        }
+
+        .method-sig {
+            font-family: monospace;
+            background: #eee;
+            padding: 0.2rem 0.4rem;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+
+        .legal-notice {
+            margin-top: 4rem;
+            padding: 2rem;
+            background: #f8f9fa;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 0.9rem;
+            color: #666;
+            border: 1px solid #ddd;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="layout">
+        <aside>
+            <nav>
+                <h3>hwplib-py</h3>
+                <ul>
+                    <li><a href="#intro">Introduction</a></li>
+                    <li><a href="#install">Installation</a></li>
+                </ul>
+
+                <strong>Cookbook (Examples)</strong>
+                <ul>
+                    <li><a href="#ex-basic">1. Load & Metadata</a></li>
+                    <li><a href="#ex-text">2. Text Extraction</a></li>
+                    <li><a href="#ex-table">3. Handling Tables</a></li>
+                    <li><a href="#ex-equation">4. Equations (Math)</a></li>
+                    <li><a href="#ex-images">5. Pictures & Images</a></li>
+                    <li><a href="#ex-shapes">6. Shapes (Lines/Rects)</a></li>
+                    <li><a href="#ex-export">7. JSON Export</a></li>
+                </ul>
+
+                <strong>API Reference</strong>
+                <ul>
+                    <li><a href="#api-structure">Object Model</a></li>
+                    <li><a href="#api-classes">Key Classes</a></li>
+                </ul>
+
+                <strong>About</strong>
+                <ul>
+                    <li><a href="#legal">Legal Notice</a></li>
+                    <li><a href="https://github.com/minseo0388/hwplib-py">GitHub Repo</a></li>
+                </ul>
+            </nav>
+        </aside>
+
+        <main>
+            <section id="intro">
+                <h1>Pure Python HWP Parser</h1>
+                <p><strong>hwplib-py</strong> allows you to analyze HWP 5.0 files using pure Python. It parses the
+                    binary OLE2 structure directly, giving you access to text, tables, and control objects without
+                    needing the Hancom Office software.</p>
+            </section>
+
+            <section id="install">
+                <h2>Installation</h2>
+                <pre><code>git clone https://github.com/minseo0388/hwplib-py.git
+cd hwplib-py
+pip install .</code></pre>
+            </section>
+
+            <!-- Cookbook Section -->
+            <section id="cookbook">
+                <h2>📘 Code Examples (Cookbook)</h2>
+                <p>Here are friendly, step-by-step examples for every major feature.</p>
+
+                <h3 id="ex-basic">1. Loading & Metadata</h3>
+                <p>Start here. Load a file and check its version and properties.</p>
+                <pre><code class="language-python">from hwplib.hwp5.api import load
+
+# Load the file
+doc = load("example.hwp")
+
+# Check File Header
+print(f"HWP Version: {doc.header.version_str}")  # e.g., "5.0.2.1"
+print(f"Compressed:  {doc.header.is_compressed}")
+print(f"Encrypted:   {doc.header.is_encrypted}")
+
+# Check Document Information (Metadata)
+print(f"Fonts used: {len(doc.doc_info.face_names)}")
+for face in doc.doc_info.face_names:
+    print(f" - Font Name: {face.name}")</code></pre>
+
+                <h3 id="ex-text">2. Text Extraction</h3>
+                <p>Extract all text content from the document, including text inside tables and text boxes.</p>
+                <pre><code class="language-python"># Simple global extraction
+full_text = doc.get_text()
+print(full_text)
+
+# Manual iteration (Section -> Paragraph)
+for i, section in enumerate(doc.sections):
+    print(f"--- Section {i} ---")
+    for paragraph in section.paragraphs:
+        # 'paragraph.text' contains the plain text of the paragraph
+        print(paragraph.text)</code></pre>
+
+                <h3 id="ex-table">3. Handling Tables</h3>
+                <p>Tables are special Controls. You can iterate through rows and cells to get structured data.</p>
+                <pre><code class="language-python">from hwplib.hwp5.core.control import ControlTable
+
+for section in doc.sections:
+    for paragraph in section.paragraphs:
+        for ctrl in paragraph.controls:
+            
+            # Check if this control is a Table
+            if isinstance(ctrl, ControlTable):
+                print(f"Found Table: {ctrl.row_count} Rows, {ctrl.col_count} Cols")
+                
+                # Iterate Rows
+                for r_idx, row in enumerate(ctrl.rows):
+                    print(f"  Row {r_idx}:")
+                    
+                    # Iterate Cells in the Row
+                    for c_idx, cell in enumerate(row.cells):
+                        # A Cell contains a list of Paragraphs!
+                        cell_text = " ".join([p.text for p in cell.paragraphs])
+                        print(f"    Cell[{c_idx}]: {cell_text}")</code></pre>
+
+                <h3 id="ex-equation">4. Equations (Math)</h3>
+                <p>Extract the method script (syntax similar to LaTeX) from equation objects.</p>
+                <pre><code class="language-python">from hwplib.hwp5.core.control import ControlEquation
+
+for section in doc.sections:
+    for paragraph in section.paragraphs:
+        for ctrl in paragraph.controls:
+            
+            if isinstance(ctrl, ControlEquation):
+                # The 'script' attribute holds the equation string
+                print(f"Equation Script: {ctrl.script}")
+                # Example Output: "y = ax^2 + bx + c"</code></pre>
+
+                <h3 id="ex-images">5. Pictures & Images</h3>
+                <p>Get information about embedded images.</p>
+                <pre><code class="language-python">from hwplib.hwp5.core.control import ControlPicture
+
+for section in doc.sections:
+    for paragraph in section.paragraphs:
+        for ctrl in paragraph.controls:
+            
+            if isinstance(ctrl, ControlPicture):
+                print(f"Image Found:")
+                print(f"  Size: {ctrl.width} x {ctrl.height}")
+                # 'bin_item_id' links to the actual binary data in the BinData stream
+                print(f"  BinData ID: {ctrl.bin_item_id}")</code></pre>
+
+                <h3 id="ex-shapes">6. Shapes (Lines, Rects, Polygons)</h3>
+                <p>Access vector drawing objects (GSO).</p>
+                <pre><code class="language-python">from hwplib.hwp5.core.control import ControlLine, ControlRect, ControlPolygon
+
+for section in doc.sections:
+    for paragraph in section.paragraphs:
+        for ctrl in paragraph.controls:
+            
+            if isinstance(ctrl, ControlLine):
+                print(f"Line from ({ctrl.start_x}, {ctrl.start_y}) to ({ctrl.end_x}, {ctrl.end_y})")
+                
+            elif isinstance(ctrl, ControlRect):
+                print(f"Rectangle: {ctrl.width} x {ctrl.height}")
+                
+            elif isinstance(ctrl, ControlPolygon):
+                print(f"Polygon with {len(ctrl.points)} vertices")</code></pre>
+
+                <h3 id="ex-export">7. JSON Export</h3>
+                <p>Convert the entire document structure to JSON for easy processing in other languages.</p>
+                <pre><code class="language-python">from hwplib.hwp5.core.exporter import HwpJsonExporter
+import json
+
+exporter = HwpJsonExporter()
+data = exporter.export(doc)
+
+# Save to file
+with open("output.json", "w", encoding="utf-8") as f:
+    json.dump(data, f, indent=2, ensure_ascii=False)</code></pre>
+            </section>
+
+            <section id="api-structure">
+                <h2>Object Model</h2>
+                <p>The library maps the HWP binary structure to these Python objects:</p>
+                <pre>
+HwpDocument
+├── header (HwpFileHeader)
+├── doc_info (DocInfo)
+│   ├── face_names[] (Font Names)
+│   ├── border_fills[]
+│   └── styles[]
+└── sections[] (List[Section])
+    └── paragraphs[] (List[Paragraph])
+        ├── text (String)
+        └── controls[] (List[HwpControl])
+            ├── ControlTable
+            │   └── rows[] -> cells[] -> paragraphs[]
+            ├── ControlPicture
+            ├── ControlEquation
+            └── ControlRect/Line/Ellipse...
+</pre>
+            </section>
+
+            <section id="legal" class="legal-notice">
+                <h3>Legal Notice</h3>
+                <p><strong>본 제품은 (주)한글과컴퓨터의 한글 문서 파일(.hwp) 공개 문서를 참고하여 개발하였습니다.</strong></p>
+                <p>(This product was developed by referring to Hancom Inc.'s public HWP file format documentation.)</p>
+                <br>
+                <small>Copyright &copy; 2026 CHoi Minseo. Licensed under Apache 2.0.</small>
+            </section>
+        </main>
+    </div>
+</body>
+
+</html>
