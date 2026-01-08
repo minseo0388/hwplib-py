@@ -1,6 +1,8 @@
 # hwplib-py
 
 [![standard-readme compliant](https://img.shields.io/badge/readme%20style-standard-brightgreen.svg?style=flat-square)](https://github.com/RichardLitt/standard-readme)
+[![PyPI version](https://img.shields.io/pypi/v/hwplib-py.svg)](https://pypi.org/project/hwplib-py/)
+[![PyPI - Python Version](https://img.shields.io/pypi/pyversions/hwplib-py.svg)](https://pypi.org/project/hwplib-py/)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
 > A pure Python parser for the HWP (Hangul Word Processor) 5.0 binary file format.
@@ -25,13 +27,6 @@ The HWP format is the standard word processing format in South Korea. While ther
 
 ```sh
 pip install hwplib-py
-```
-*(Note: Not yet on PyPI, clone and install locally)*
-
-```sh
-git clone https://github.com/minseo0388/hwplib-py.git
-cd hwplib-py
-pip install .
 ```
 
 ## Usage
